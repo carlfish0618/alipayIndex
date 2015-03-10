@@ -733,6 +733,10 @@ PROC SORT DATA = test_stock_pool;
 	BY end_date stock_code;
 RUN;
 
+/** 避免极端情况，所有股票的im_wt都为0 **/
+/** 其实这个步骤也可以不用。因为在增强部分设定了，如果没有选中行业则还按照基准配置。**/
+%neutralize_weight(stock_pool=test_stock_pool, output_stock_pool=test_stock_pool);
+
 /* 限制个股权重 */
 %limit_adjust_stock_only(stock_pool=test_stock_pool, stock_upper=0.1, stock_lower=0, output_stock_pool=test_stock_pool);
 
