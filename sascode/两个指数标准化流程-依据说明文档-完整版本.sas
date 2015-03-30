@@ -169,7 +169,7 @@ QUIT;
 %MEND gen_mapping_extend;
 
 %gen_mapping_extend(input_table=entertain_map, start_date=15jan2011, 
-		end_date=30sep2014, output_table=entertain_map2);
+		end_date=31dec2014, output_table=entertain_map2);
 %gen_mapping_extend(input_table=medicine_map, start_date=15dec2008, 
 		end_date=31dec2014, output_table=medicine_map2);
 
@@ -293,33 +293,33 @@ RUN;
 
 /** 3- 娱乐生活：行业得分 */
 /** 富国因子得分 */
-PROC IMPORT OUT = entertain_f /* 富国因子 */
-            DATAFILE= "&input_dir.\factors_value_ed6.xlsx" 
-            DBMS=EXCEL REPLACE;
-     RANGE="行业月度得分$"; 
-     GETNAMES=YES;
-     MIXED=NO;
-     SCANTEXT=NO;
-     USEDATE=YES;
-     SCANTIME=YES;
-RUN;
+/*PROC IMPORT OUT = entertain_f */
+/*            DATAFILE= "&input_dir.\factors_value_ed6.xlsx" */
+/*            DBMS=EXCEL REPLACE;*/
+/*     RANGE="行业月度得分$"; */
+/*     GETNAMES=YES;*/
+/*     MIXED=NO;*/
+/*     SCANTEXT=NO;*/
+/*     USEDATE=YES;*/
+/*     SCANTIME=YES;*/
+/*RUN;*/
 
 /** Step1-appendix: 读入淘宝因子数据 */
-PROC IMPORT OUT = entertain_t
-            DATAFILE= "&input_dir.\taobao_factors.xlsx" 
-            DBMS=EXCEL REPLACE;
-     RANGE="行业月度得分$"; 
-     GETNAMES=YES;
-     MIXED=NO;
-     SCANTEXT=NO;
-     USEDATE=YES;
-     SCANTIME=YES;
-RUN;
-PROC TRANSPOSE DATA = entertain_t OUT = entertain_t(drop = _LABEL_ rename=(_NAME_ = fg_level2_name col1 = taobao));
-	VAR 影视动漫--网络视频;
-	BY end_date;
-RUN;
-
+/*PROC IMPORT OUT = entertain_t*/
+/*            DATAFILE= "&input_dir.\娱乐生活淘宝因子20150323.xlsx" */
+/*            DBMS=EXCEL REPLACE;*/
+/*     RANGE="行业月度得分$"; */
+/*     GETNAMES=YES;*/
+/*     MIXED=NO;*/
+/*     SCANTEXT=NO;*/
+/*     USEDATE=YES;*/
+/*     SCANTIME=YES;*/
+/*RUN;*/
+/*PROC TRANSPOSE DATA = entertain_t OUT = entertain_t(drop = _LABEL_ rename=(_NAME_ = fg_level2_name col1 = taobao));*/
+/*	VAR 影视动漫--网络视频;*/
+/*	BY end_date;*/
+/*RUN;*/
+%INCLUDE "D:\Research\淘消费\阿里-产品\sascode\从阿里输出获取淘宝因子.sas";
 PROC SQL;
 	CREATE TABLE tmp AS
 	SELECT A.end_date, A.fg_level2_name, 
@@ -327,7 +327,7 @@ PROC SQL;
 	B.taobao AS taobao_score LABEL "taobao_score"
 	FROM entertain_f A LEFT JOIN entertain_t B
 	ON A.end_date = B.end_date AND A.fg_level2_name = B.fg_level2_name
-	WHERE  "15jan2011"d <= A.end_date <= "30sep2014"d
+	WHERE  "15jan2011"d <= A.end_date <= "31dec2014"d
 	ORDER BY A.end_date, A.fg_level2_name;
 QUIT;
 DATA factors_value;
@@ -536,7 +536,7 @@ PROC SQL;
 QUIT;
 DATA adjust_busdate;
 	SET adjust_busdate;
-	IF "15jan2011"d <= end_date <= "30sep2014"d;
+	IF "15jan2011"d <= end_date <= "31dec2014"d;
 RUN;
 
 DATA sub_test(rename = (end_date = date));
@@ -749,6 +749,9 @@ DATA entertain_pool;
 RUN;
 PROC SORT DATA = entertain_pool;
 	BY end_date descending weight;
+RUN;
+DATA product.taobao_stock_pool;
+	SET entertain_pool med_pool;
 RUN;
 
 
